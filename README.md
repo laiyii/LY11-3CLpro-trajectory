@@ -1,5 +1,5 @@
 # Source data for *Discovery of D-Peptides that Allosterically Enhance SARS-CoV-2 3CLpro Activity by Stabilizing its Monomeric State*
-This repository provides source data of *Discovery of D-Peptides that Allosterically Enhance SARS-CoV-2 3CLpro Activity by Stabilizing its Monomeric State*, including replicated MD trajectories, activated complex structure, MD scripts and relative analyzing scripts. If you have any questions, feel free to discuss in [Issues](https://github.com/laiyii/LY11-3CLpro-trajectory/issues).<br>
+This repository contains the source data supporting the manuscript titled 'Discovery of D-Peptides that Allosterically Enhance SARS-CoV-2 3CLpro Activity by Stabilizing its Monomeric State.' The dataset includes independent MD simulation replicas (triplicates), the coordinates of the stabilized complex structure, and the full suite of MD protocols and associated analysis scripts required to reproduce the study. If you have any questions, feel free to discuss in [Issues](https://github.com/laiyii/LY11-3CLpro-trajectory/issues).<br>
 
 <p align="center">
   <img src="https://github.com/laiyii/LY11-3CLpro-trajectory/blob/main/workflow.png" />
@@ -41,9 +41,7 @@ gmx rms -n index.ndx -s md.tpr -f LY11_3CL.xtc -o LY11_3CL.xvg -tu ns
 gmx_MMPBSA -O -i mmpbsa.in -cs md.tpr -ci index.ndx -cg 20 19 -ct LY11_3CL.xtc -cp topol.top -o LY11_3CL.dat -eo LY11_3CL.csv -nogui
 ```
 ## MD simulation results
-Here, we provide triplicated trajectories of LY11-3CLpro from three different initial velocities.<br>
-Click [here](https://doi.org/10.5281/zenodo.20587106) to download triplicated trajectories.
-We also provide analyzing scripts in folder analysis, and we can reproduce the results in Figure 5.
+We provide triplicate MD trajectories for the LY11-3CLpro system, generated from three distinct initial velocities as per Protein Science guidelines. Click [here](https://doi.org/10.5281/zenodo.20587106) to access the data.The /analysis folder contains the necessary scripts to replicate the quantitative findings and visualizations shown in Figure 5.
 ```shell
 python result_cal_script.py input.pdb output_name
 ```
