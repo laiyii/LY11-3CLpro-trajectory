@@ -40,10 +40,16 @@ gmx trjconv -f md_nojump.xtc -o mono28_%s_E2P.xtc -s md.tpr -center
 gmx rms -n index.ndx -s md.tpr -f LY11_3CL.xtc -o LY11_3CL.xvg -tu ns
 gmx_MMPBSA -O -i mmpbsa.in -cs md.tpr -ci index.ndx -cg 20 19 -ct LY11_3CL.xtc -cp topol.top -o LY11_3CL.dat -eo LY11_3CL.csv -nogui
 ```
-
-Click [here](https://pan.baidu.com/s/1lKv6-XoMh6dJfG7dW_JR4A?pwd=14kv) (extraction code: 14kv) to download triplicated trajectories.
-
-
-
+## MD simulation results
+Here, we provide triplicated trajectories of LY11-3CLpro from three different initial velocities.<br>
+Click [here](https://doi.org/10.5281/zenodo.20587106) to download triplicated trajectories.
+We also provide analyzing scripts in folder analysis, and we can reproduce the results in Figure 5.
+```shell
+python result_cal_script.py input.pdb output_name
+```
+For example, to calculate domain dihedral distribution, the command is
+```shell
+python calc_MD_domain_dihedral.py input.pdb output_name
+```
 
 
