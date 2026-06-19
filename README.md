@@ -1,5 +1,5 @@
 # Source data for *Discovery of D-Peptides that Allosterically Enhance SARS-CoV-2 3CLpro Activity by Stabilizing its Monomeric State*
-This repository contains the source data supporting the manuscript titled *Discovery of D-Peptides that Allosterically Enhance SARS-CoV-2 3CLpro Activity by Stabilizing its Monomeric State*. The dataset includes independent MD simulation replicas (triplicates), the coordinates of the stabilized complex structure, and the full suite of MD protocols and associated analysis scripts required to reproduce the study. If you have any questions, feel free to discuss in [Issues](https://github.com/laiyii/LY11-3CLpro-trajectory/issues).<br>
+This repository contains the source data supporting the manuscript titled *Discovery of D-Peptides that Allosterically Enhance SARS-CoV-2 3CLpro Activity by Stabilizing its Monomeric State*. The dataset includes independent MD simulation replicas (triplicates), the coordinates of the stabilized complex structure, and the full suite of MD protocols and associated sequence design and analysis scripts required to reproduce the study. If you have any questions, feel free to discuss in [Issues](https://github.com/laiyii/LY11-3CLpro-trajectory/issues).<br>
 
 <p align="center">
   <img src="https://github.com/laiyii/LY11-3CLpro-trajectory/blob/main/logo.png" />
