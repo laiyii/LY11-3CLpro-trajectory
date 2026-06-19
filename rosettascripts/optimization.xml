@@ -1,0 +1,156 @@
+<ROSETTASCRIPTS> helix is chainA, mpro is chainB
+    <SCOREFXNS>
+        <ScoreFunction name="SFXN6_vanilla" weights="beta_nov16" symmetric="0" >
+        </ScoreFunction >
+        <ScoreFunction name="SFXN6_vanilla_cst" weights="beta_nov16" symmetric="0" >
+            <Reweight scoretype="aa_composition" weight="1.0" />
+        </ScoreFunction >
+    </SCOREFXNS>
+
+    <RESIDUE_SELECTORS>
+        <Chain name="chainA" chains="A"/>
+        <Chain name="chainB" chains="2"/>
+        <Neighborhood name="chainB_interface" selector="chainA" distance="10.0" include_focus_in_subset="false"/>
+        <Not name="not_chainB_interface" selector="chainB_interface"/>
+        <And name="chainB_not_interface" selectors="chainB,not_chainB_interface"/>
+        <Index name="chainA_do_not_change" resnums="2A,19A"/>
+        <Index name="chainA_alter_to_W_4" resnums="4A"/>
+        <Index name="chainA_alter_to_W_8" resnums="8A"/>
+        <Index name="chainA_alter_to_W_12" resnums="12A"/>
+        <Index name="chainA_alter_to_W_15" resnums="15A"/>
+        <Index name="chainA_restrict_to_nonpolar" resnums="5A,16A,22A"/>
+        <Index name="chainA_restrict_to_polar" resnums="1A,3A,6A,7A,9A,10A,11A,13A,21A,23A,24A,27A,14A,17A,18A,20A,25A,26A,28A"/>
+    </RESIDUE_SELECTORS>
+
+
+    <MOVERS>
+        <SwitchChainOrder name="keep_only_chain_A" chain_order="1"/>
+    </MOVERS>
+    
+    <FILTERS>
+        <!--Generic-->
+        <ScoreType name="score_disabled" scorefxn="SFXN6_vanilla" score_type="total_score" threshold="0.0" confidence="0" /> 
+        <ResidueCount name="nres_disabled" confidence="0" /> 
+        <!--Not Enabled-->
+        <!--cmd path changed-->
+        <SSPrediction name="sspred_disabled" cmd="/home/lhlai_pkuhpc/lustre2/ljj/rosetta1113/tools/fragment_tools/psipred/runpsipred_single" use_probability="0" use_svm="0" threshold="0.80" confidence="0.5"/>
+        <!-- <SSPrediction name="sspred_disabled" cmd="/home/lhlai_pkuhpc/lustre2/ljj/rosetta1113/tools/fragment_tools/psipred/runpsipred_single" use_probability="0" use_svm="0" threshold="0.80" confidence="0.3" secstruct='H'/> -->
+        <Rmsd name="rmsd_chainA_not_align_disabled" reference_name="reference_conformation" chains="A" superimpose="0" threshold="2.7" confidence="0"/>
+        <Rmsd name="rmsd_chainA_align_disabled"     reference_name="reference_conformation" chains="A" superimpose="1" threshold="2.2" confidence="0"/>
+        <CalculatorFilter name="score_res_disabled" equation="SCORE/NRES" threshold="-2.1" confidence="0">
+            <Var name="SCORE" filter_name="score_disabled" />
+            <Var name="NRES" filter_name="nres_disabled" />
+        </CalculatorFilter>
+        <Ddg name="ddg" scorefxn="SFXN6_vanilla" jump="1" repack="1" repeats="5" threshold="-40.0" confidence="1"/>
+        <ResInInterface name="resInInterface" residues="27" jump_number="1" confidence="1"/>
+        <Sasa name="sasa" threshold="1400" jump="1" confidence="0"/> do not restrain sasa
+        <BuriedUnsatHbonds name="buriedUnsatHBonds" scorefxn="SFXN6_vanilla" jump_number="1" use_legacy_options="true" print_out_info_to_pdb="true"/>
+        <!-- <ResidueCount name="W_count" residue_types="TRP" count_as_percentage="0" residue_selector="chainA" confidence="0.9"/> -->
+        <ShapeComplementarity name="shapeComplementarity" jump="1" verbose="1" min_sc="0.6" write_int_area="0" confidence="0.5"/>
+        Calculates the Lawrence and Coleman shape complementarity, filtered if score is lower than 0.6
+        <InterfaceHoles name="interfaceHoles" jump="1" threshold="200" confidence="0.5"/>
+        difference between bound and unbounded score larger than 200 will be filtered.
+        <ResidueCount name="n_hydrophobic_res" max_residue_count="10" min_residue_count="8" residue_types="VAL,ILE,LEU,PHE,MET,TYR,TRP" count_as_percentage="0" residue_selector="chainA" confidence="1" />
+        <NetCharge name="charge_restrict" min="-3" max="3" chain="1" confidence="1" /> positive charge is reserved
+    </FILTERS>
+    
+    <FILTERS>
+        <!--Chain A Filters-->
+        <!--Not Enabled-->
+        <MoveBeforeFilter name="sspred_chainA_disabled" mover="keep_only_chain_A" filter="sspred_disabled" confidence="0"/> 
+        calculate percentage of residues with a secondary structure(helix not specified?)
+        <MoveBeforeFilter name="score_res_chainA_disabled" mover="keep_only_chain_A" filter="score_res_disabled" confidence="0"/> 
+        <MoveBeforeFilter name="zero_netcharge_chain_A_disabled" mover="keep_only_chain_A" filter="charge_restrict" confidence="1"/>
+    </FILTERS>
+
+    <TASKOPERATIONS>
+        <InitializeFromCommandline name="init"/>
+        <IncludeCurrent name="inclcur"/>
+        <LimitAromaChi2 name="limitchi2" />
+        <ReadResfile name="resfile" filename="template.resfile" />
+        <OperateOnResidueSubset name="chainB_interface_onlyrepack" selector="chainB_interface" >
+            <RestrictToRepackingRLT/>
+        </OperateOnResidueSubset>
+        <OperateOnResidueSubset name="chainB_freeze_others" selector="chainB_not_interface" >
+            <PreventRepackingRLT/>
+        </OperateOnResidueSubset>
+        <OperateOnResidueSubset name="chain_A_do_not_change" selector="chainA_do_not_change" >
+            <RestrictToRepackingRLT/>
+        </OperateOnResidueSubset>
+        <OperateOnResidueSubset name="chain_A_alter_to_W_4" selector="chainA_alter_to_W_4" >
+           <RestrictAbsentCanonicalAASRLT aas="IW"/> 
+        </OperateOnResidueSubset>
+        <OperateOnResidueSubset name="chain_A_alter_to_W_8" selector="chainA_alter_to_W_8" >
+           <RestrictAbsentCanonicalAASRLT aas="LW"/> 
+        </OperateOnResidueSubset>
+        <OperateOnResidueSubset name="chain_A_alter_to_W_12" selector="chainA_alter_to_W_12" >
+           <RestrictAbsentCanonicalAASRLT aas="FW"/> 
+        </OperateOnResidueSubset>
+        <OperateOnResidueSubset name="chain_A_alter_to_W_15" selector="chainA_alter_to_W_15" >
+           <RestrictAbsentCanonicalAASRLT aas="MW"/> 
+        </OperateOnResidueSubset>
+        <OperateOnResidueSubset name="chain_A_restrict_to_polar" selector="chainA_restrict_to_polar" >
+           <RestrictAbsentCanonicalAASRLT aas="ADEHKNQRST"/> 
+        </OperateOnResidueSubset>
+        <OperateOnResidueSubset name="chain_A_restrict_to_nonpolar" selector="chainA_restrict_to_nonpolar" >
+           <RestrictAbsentCanonicalAASRLT aas="VILFMYW"/> 
+        </OperateOnResidueSubset>         
+    </TASKOPERATIONS>
+	<PACKER_PALETTES>
+		<CustomBaseTypePackerPalette name="custom_palette" additional_residue_types="DALA,DVAL,DILE,DLEU,DTRP,DPHE,DTYR,DTHR,DSER,DHIS,DARG,DLYS,DGLU,DGLN,DASP,DASN,DPRO,DMET,DCYS" />
+	</PACKER_PALETTES>
+
+    <MOVE_MAP_FACTORIES>
+        <MoveMapFactory name="mmpfdfr" bb="0" chi="0" jumps="1">
+            <Backbone residue_selector="chainA" />
+            <Chi residue_selector="chainA" />
+            <Chi residue_selector="chainB_interface" />
+        </MoveMapFactory>
+    </MOVE_MAP_FACTORIES>
+    
+    <MOVERS>
+        <SavePoseMover name="save_RMSDreference_conformation"  reference_name="reference_conformation"/> save pose which name is reference_conformation
+        <SavePDBInfoMover name="saveInitPDBinfo"   reference_info_name="initPDBinfo" restore_info="0" /> name the info as initPDBinfo, not restore info
+        <SavePDBInfoMover name="reloadInitPDBinfo" reference_info_name="initPDBinfo" restore_info="1" /> name the info as initPDBinfo, restore info
+        <ClearCompositionConstraintsMover name="clearCompConstraints" />
+        <AddCompositionConstraintMover name="allow1W" filename="W_constraint.comp" selector="chainA"/>
+        <FastDesign name="fdesign_vanilla_cst" scorefxn="SFXN6_vanilla_cst"  movemap_factory="mmpfdfr" packer_palette="custom_palette" task_operations="resfile,init,inclcur,limitchi2,chainB_interface_onlyrepack,chainB_freeze_others,chain_A_do_not_change,chain_A_alter_to_W_4,chain_A_alter_to_W_8,chain_A_alter_to_W_12,chain_A_alter_to_W_15,chain_A_restrict_to_nonpolar,chain_A_restrict_to_polar"  repeats="3"  clear_designable_residues="0" >
+        scorefxn includes res penalty. allow dof of bb, chi torsion. design include d-type res. task_operations include: select enable res, all common except Cys; apply cmd line flag; tell packer also consider the input rotamer; Don't use aromatics rotamers known to be spurious design; ... same as fastrelax. finally clear_designable_residues .repeat 3 times.
+        </FastDesign>
+        <FastRelax name="fast_relax_vanilla" scorefxn="SFXN6_vanilla" packer_palette="custom_palette" task_operations="init,inclcur,limitchi2,chainB_interface_onlyrepack,chainB_freeze_others,chain_A_do_not_change,chain_A_alter_to_W_4,chain_A_alter_to_W_8,chain_A_alter_to_W_12,chain_A_alter_to_W_15,chain_A_restrict_to_nonpolar,chain_A_restrict_to_polar"  movemap_factory="mmpfdfr" repeats="3" > pack residues include D-types;
+        taskoperations:Apply certain command line packer behavior flags, Tell the packer to also consider the input rotamer, Don't use aromatics rotamers known to be spurious design, only repack res on mpro within 10A of helix and others don't move, select residues allowed (20 res except C). dont restrict helix and interfaceresidues of mpro torsion angles. repeat these for 3 times.
+        </FastRelax>
+	    <ParsedProtocol name="reloadHS_and_fastDesign_with_cst" >
+            <Add mover_name="reloadInitPDBinfo" /> restore initPDBinfo
+            <Add mover_name="allow1W"/>
+            <Add mover_name="fdesign_vanilla_cst" />    fast design
+            <Add mover_name="clearCompConstraints" />remove sequence constraints (e.g. amino acid composition constraints, net charge constraints)
+        </ParsedProtocol>
+        <InterfaceAnalyzerMover name="InterfaceAna" scorefxn="SFXN6_vanilla"
+        pack_separated="true" pack_input="false"
+        resfile="false" packstat="true"
+        interface_sc="true" tracer="false"
+        use_jobname="true" ligandchain="A" />
+    </MOVERS>
+    
+    <PROTOCOLS>
+        <Add mover_name="saveInitPDBinfo" /> save initial strcture
+        <Add mover_name="save_RMSDreference_conformation" /> save rmsd reference conformation
+        <Add mover_name="reloadHS_and_fastDesign_with_cst" /> restore initPDBinfo, fastdesign, remove constraints
+        <Add mover_name="fast_relax_vanilla" /> relax the compound
+        <Add  filter_name="rmsd_chainA_not_align_disabled" /> abandon rmsd>2.7, chainA is superimposed
+        <Add  filter_name="rmsd_chainA_align_disabled" /> abandon rmsd> 2.2, chainA is not superimposed
+        <Add filter_name="score_res_chainA_disabled" /> calculate score per residue on helix, lower than -2.1 is reserved
+        <Add filter_name="sspred_chainA_disabled" /> return fraction of coil with secondary structure, higher than 80% is reserved
+        <Add filter_name="zero_netcharge_chain_A_disabled"/> only 0 net_charge of helix will pass
+        <Add filter_name="score_disabled"/> structure will be filtered if score per res is larger than -2.1
+        <Add filter_name="ddg" /> reserve binding energy smaller than -18
+        <Add filter_name="resInInterface"/> interface residues more than 34 is reserved (should adjust)
+        <Add filter_name="sasa" /> sasa larger than 1750 is reserved
+        <Add filter_name="buriedUnsatHBonds"/> calculate buriedUnsatHBonds and output it
+        <Add filter_name="shapeComplementarity"/> reserve score more than 0.6
+        <Add filter_name="interfaceHoles"/> hole score difference less than 200 is reserved.
+        <Add filter_name="n_hydrophobic_res"/> fraction of V,I,L,F,M,Y,W  ranging in 20% to 50% is reserved.
+        <Add mover_name="InterfaceAna" /> calculate interface infos of helix
+    </PROTOCOLS>
+</ROSETTASCRIPTS>
